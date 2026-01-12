@@ -12,6 +12,7 @@ fn configuration()->Conf {
 }
 #[macroquad::main(configuration)]
 async fn main() {
+    
     let mut speed = 0.0;
     let mut x = screen_width()/2.0;
     let mut y = screen_height()/2.0;
@@ -30,27 +31,40 @@ async fn main() {
     let center1 = circle.size/2.0;
     let center2 = circle2.size/2.0;
     let collision_detector = center1+center2;
+    let absorb = 500.0;
     loop {
         let mut   time = get_frame_time();
         clear_background(DARKPURPLE);
         
-        if is_key_down(KeyCode::Right) {
+        if is_key_pressed(KeyCode::Right) {
             
             speed = 750.0;
          }
-        if  is_key_down(KeyCode::Left) {
+        if  is_key_pressed(KeyCode::Left) {
             speed = -750.0;
     }
         circle.x+=time*speed;
         draw_circle(circle.x, circle.y, circle.size,RED);
         draw_circle(circle2.x, circle2.y, circle2.size, RED);
         if circle2.x - circle.x<collision_detector {
-            speed = -speed;
+            speed = -speed*0.8;
                      }
-        circle.x = clamp(circle.x,0.0, screen_width());
+        if circle.x - circle.size / 2.0 <= 0.0 {
+                        circle.x = circle.size / 2.0; // left edge
+                                    speed = -speed * 0.8;
+                                            }
+      if circle.x + circle.size / 2.0 >= screen_width() {
+                                                                    circle.x = screen_width() - circle.size / 2.0; // right edge
+                                                                                speed = -speed * 0.8;
+                                                                                        }
+                                                    
+        
+        circle.x = clamp(circle.x,circle.size/2.0, screen_width()-circle.size/2.0);
         next_frame().await;
+        }
+        }
     
     
   
-}
-}
+
+
